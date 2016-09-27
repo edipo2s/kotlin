@@ -37,11 +37,16 @@ private class ReversedList<T>(private val delegate: MutableList<T>) : AbstractMu
         delegate.add(reversePositionIndex(index), element)
     }
 }
-private fun List<*>.reverseElementIndex(index: Int) = // TODO: Use AbstractList.checkElementIndex: run { AbstractList.checkElementIndex(index, size); lastIndex - index }
-        if (index in 0..size - 1) size - index - 1 else throw IndexOutOfBoundsException("Index $index should be in range [${0..size - 1}].")
+private fun List<*>.reverseElementIndex(index: Int): Int
+{
+    AbstractList.checkElementIndex(index = index, size = size)
+    return lastIndex - index
+}
 
-private fun List<*>.reversePositionIndex(index: Int) =
-        if (index in 0..size) size - index else throw IndexOutOfBoundsException("Index $index should be in range [${0..size}].")
+private fun List<*>.reversePositionIndex(index: Int): Int {
+    AbstractList.checkPositionIndex(index = index, size = size)
+    return size - index
+}
 
 
 /**
