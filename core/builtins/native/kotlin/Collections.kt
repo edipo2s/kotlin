@@ -36,7 +36,7 @@ public interface Iterable<out T> {
  */
 public interface MutableIterable<out T> : Iterable<T> {
     /**
-     * Returns an iterator over the elementrs of this sequence that supports removing elements during iteration.
+     * Returns an iterator over the elements of this sequence that supports removing elements during iteration.
      */
     override fun iterator(): MutableIterator<T>
 }
@@ -62,6 +62,7 @@ public interface Collection<out E> : Iterable<E> {
      * Checks if the specified element is contained in this collection.
      */
     public operator fun contains(element: @UnsafeVariance E): Boolean
+
     override fun iterator(): Iterator<E>
 
     // Bulk Operations
@@ -131,6 +132,7 @@ public interface MutableCollection<E> : Collection<E>, MutableIterable<E> {
 public interface List<out E> : Collection<E> {
     // Query Operations
     override val size: Int
+
     override fun isEmpty(): Boolean
     override fun contains(element: @UnsafeVariance E): Boolean
     override fun iterator(): Iterator<E>
@@ -183,6 +185,7 @@ public interface List<out E> : Collection<E> {
 public interface MutableList<E> : List<E>, MutableCollection<E> {
     // Modification Operations
     override fun add(element: E): Boolean
+
     override fun remove(element: E): Boolean
 
     // Bulk Modification Operations
@@ -194,6 +197,7 @@ public interface MutableList<E> : List<E>, MutableCollection<E> {
      * @return `true` if the list was changed as the result of the operation.
      */
     public fun addAll(index: Int, elements: Collection<E>): Boolean
+
     override fun removeAll(elements: Collection<E>): Boolean
     override fun retainAll(elements: Collection<E>): Boolean
     override fun clear(): Unit
@@ -220,6 +224,7 @@ public interface MutableList<E> : List<E>, MutableCollection<E> {
 
     // List Iterators
     override fun listIterator(): MutableListIterator<E>
+
     override fun listIterator(index: Int): MutableListIterator<E>
 
     // View
@@ -235,6 +240,7 @@ public interface MutableList<E> : List<E>, MutableCollection<E> {
 public interface Set<out E> : Collection<E> {
     // Query Operations
     override val size: Int
+
     override fun isEmpty(): Boolean
     override fun contains(element: @UnsafeVariance E): Boolean
     override fun iterator(): Iterator<E>
@@ -254,10 +260,12 @@ public interface MutableSet<E> : Set<E>, MutableCollection<E> {
 
     // Modification Operations
     override fun add(element: E): Boolean
+
     override fun remove(element: E): Boolean
 
     // Bulk Modification Operations
     override fun addAll(elements: Collection<E>): Boolean
+
     override fun removeAll(elements: Collection<E>): Boolean
     override fun retainAll(elements: Collection<E>): Boolean
     override fun clear(): Unit
@@ -395,12 +403,12 @@ public interface MutableMap<K, V> : Map<K, V> {
     /**
      * Represents a key/value pair held by a [MutableMap].
      */
-    public interface MutableEntry<K,V>: Map.Entry<K, V> {
+    public interface MutableEntry<K, V> : Map.Entry<K, V> {
         /**
          * Changes the value associated with the key of this entry.
          *
          * @return the previous value corresponding to the key.
          */
-         public fun setValue(newValue: V): V
+        public fun setValue(newValue: V): V
     }
 }
