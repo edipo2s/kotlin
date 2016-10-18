@@ -21,7 +21,7 @@ import kotlin.internal.PlatformDependent
 /**
  * Classes that inherit from this interface can be represented as a sequence of elements that can
  * be iterated over.
- * @param T the type of element being iterated over.
+ * @param T the type of element being iterated over. The iterator is covariant on its element type.
  */
 public interface Iterable<out T> {
     /**
@@ -33,6 +33,7 @@ public interface Iterable<out T> {
 /**
  * Classes that inherit from this interface can be represented as a sequence of elements that can
  * be iterated over and that supports removing elements during iteration.
+ * @param T the type of element being iterated over. The mutable iterator is invariant on its element type.
  */
 public interface MutableIterable<out T> : Iterable<T> {
     /**
@@ -44,7 +45,7 @@ public interface MutableIterable<out T> : Iterable<T> {
 /**
  * A generic collection of elements. Methods in this interface support only read-only access to the collection;
  * read/write access is supported through the [MutableCollection] interface.
- * @param E the type of elements contained in the collection.
+ * @param E the type of elements contained in the collection. The collection is covariant on its element type.
  */
 public interface Collection<out E> : Iterable<E> {
     // Query Operations
@@ -74,6 +75,8 @@ public interface Collection<out E> : Iterable<E> {
 
 /**
  * A generic collection of elements that supports adding and removing elements.
+ *
+ * @param E the type of elements contained in the collection. The mutable collection is invariant on its element type.
  */
 public interface MutableCollection<E> : Collection<E>, MutableIterable<E> {
     // Query Operations
@@ -127,7 +130,7 @@ public interface MutableCollection<E> : Collection<E>, MutableIterable<E> {
 /**
  * A generic ordered collection of elements. Methods in this interface support only read-only access to the list;
  * read/write access is supported through the [MutableList] interface.
- * @param E the type of elements contained in the list.
+ * @param E the type of elements contained in the list. The list is covariant on its element type.
  */
 public interface List<out E> : Collection<E> {
     // Query Operations
@@ -182,7 +185,7 @@ public interface List<out E> : Collection<E> {
 
 /**
  * A generic ordered collection of elements that supports adding and removing elements.
- * @param E the type of elements contained in the list.
+ * @param E the type of elements contained in the list. The mutable list is invariant on its element type.
  */
 public interface MutableList<E> : List<E>, MutableCollection<E> {
     // Modification Operations
@@ -237,7 +240,7 @@ public interface MutableList<E> : List<E>, MutableCollection<E> {
  * A generic unordered collection of elements that does not support duplicate elements.
  * Methods in this interface support only read-only access to the set;
  * read/write access is supported through the [MutableSet] interface.
- * @param E the type of elements contained in the set.
+ * @param E the type of elements contained in the set. The set is covariant on its element type.
  */
 public interface Set<out E> : Collection<E> {
     // Query Operations
@@ -254,7 +257,7 @@ public interface Set<out E> : Collection<E> {
 /**
  * A generic unordered collection of elements that does not support duplicate elements, and supports
  * adding and removing elements.
- * @param E the type of elements contained in the set.
+ * @param E the type of elements contained in the set. The mutable set is invariant on its element type.
  */
 public interface MutableSet<E> : Set<E>, MutableCollection<E> {
     // Query Operations
@@ -278,8 +281,9 @@ public interface MutableSet<E> : Set<E>, MutableCollection<E> {
  * the value corresponding to each key. Map keys are unique; the map holds only one value for each key.
  * Methods in this interface support only read-only access to the map; read-write access is supported through
  * the [MutableMap] interface.
- * @param K the type of map keys.
- * @param V the type of map values.
+ * @param K the type of map keys. The map is invariant on its key type, as it
+ *          can accept key as a parameter (of [containsKey] for example) and return it in [keys] set.
+ * @param V the type of map values. The map is covariant on its value type.
  */
 public interface Map<K, out V> {
     // Query Operations
@@ -355,9 +359,8 @@ public interface Map<K, out V> {
 /**
  * A modifiable collection that holds pairs of objects (keys and values) and supports efficiently retrieving
  * the value corresponding to each key. Map keys are unique; the map holds only one value for each key.
- * @param K the type of map keys.
- * @param V the type of map values.
- */
+ * @param K the type of map keys. The map is invariant on its key type.
+ * @param V the type of map values. The mutable map is invariant on its value type. */
 public interface MutableMap<K, V> : Map<K, V> {
     // Modification Operations
     /**
