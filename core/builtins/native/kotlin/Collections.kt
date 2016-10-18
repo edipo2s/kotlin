@@ -174,6 +174,8 @@ public interface List<out E> : Collection<E> {
     /**
      * Returns a view of the portion of this list between the specified [fromIndex] (inclusive) and [toIndex] (exclusive).
      * The returned list is backed by this list, so non-structural changes in the returned list are reflected in this list, and vice-versa.
+     *
+     * Structural changes in the base list makes the behavior of the view undefined.
      */
     public fun subList(fromIndex: Int, toIndex: Int): List<E>
 }
@@ -320,17 +322,17 @@ public interface Map<K, out V> {
 
     // Views
     /**
-     * Returns a [Set] of all keys in this map.
+     * Returns a read-only [Set] of all keys in this map.
      */
     public val keys: Set<K>
 
     /**
-     * Returns a [Collection] of all values in this map. Note that this collection may contain duplicate values.
+     * Returns a read-only [Collection] of all values in this map. Note that this collection may contain duplicate values.
      */
     public val values: Collection<V>
 
     /**
-     * Returns a [Set] of all key/value pairs in this map.
+     * Returns a read-only [Set] of all key/value pairs in this map.
      */
     public val entries: Set<Map.Entry<K, V>>
 
@@ -396,9 +398,20 @@ public interface MutableMap<K, V> : Map<K, V> {
     public fun clear(): Unit
 
     // Views
+    /**
+     * Returns a mutable [Set] of all keys in this map.
+     */
     override val keys: MutableSet<K>
-    override val values: MutableCollection<V>
+
+    /**
+     * Returns a mutable [Collection] of all values in this map. Note that this collection may contain duplicate values.
+     */
     override val entries: MutableSet<MutableMap.MutableEntry<K, V>>
+
+    /**
+     * Returns a mutable [Set] of all key/value pairs in this map.
+     */
+    override val values: MutableCollection<V>
 
     /**
      * Represents a key/value pair held by a [MutableMap].
