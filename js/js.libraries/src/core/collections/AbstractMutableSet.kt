@@ -15,6 +15,11 @@
  */
 package kotlin.collections
 
+/**
+ * Provides a skeletal implementation of the [MutableSet] interface.
+ *
+ * @param E the type of elements contained in the set. The set is invariant on its element type.
+ */
 public abstract class AbstractMutableSet<E> protected constructor() : AbstractMutableCollection<E>(), MutableSet<E> {
 
     override fun equals(other: Any?): Boolean {

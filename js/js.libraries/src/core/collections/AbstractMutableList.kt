@@ -21,6 +21,11 @@
 
 package kotlin.collections
 
+/**
+ * Provides a skeletal implementation of the [MutableList] interface.
+ *
+ * @param E the type of elements contained in the list. The list is invariant on its element type.
+ */
 public abstract class AbstractMutableList<E> protected constructor() : AbstractMutableCollection<E>(), MutableList<E> {
     protected var modCount: Int = 0
 
