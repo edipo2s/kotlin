@@ -18,7 +18,7 @@ package org.jetbrains.kotlin.builtins
 
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.name.FqName
-import org.jetbrains.kotlin.serialization.builtins.BuiltInsProtoBuf
+import org.jetbrains.kotlin.serialization.ProtoBuf
 import org.jetbrains.kotlin.serialization.deserialization.DeserializedPackageFragment
 import org.jetbrains.kotlin.serialization.deserialization.NameResolverImpl
 import org.jetbrains.kotlin.serialization.deserialization.descriptors.DeserializedPackageMemberScope
@@ -43,7 +43,7 @@ class BuiltInsPackageFragment(
             )
         }
 
-        BuiltInsProtoBuf.BuiltIns.parseFrom(stream, BuiltInSerializerProtocol.extensionRegistry)
+        ProtoBuf.PackageFragment.parseFrom(stream, BuiltInSerializerProtocol.extensionRegistry)
     }
 
     private val nameResolver = NameResolverImpl(proto.strings, proto.qualifiedNames)
