@@ -21,10 +21,11 @@ import com.intellij.psi.impl.compiled.ClassFileStubBuilder
 import com.intellij.psi.stubs.PsiFileStub
 import com.intellij.util.indexing.FileContent
 import org.jetbrains.kotlin.builtins.BuiltInSerializerProtocol
-import org.jetbrains.kotlin.serialization.deserialization.ProtoBasedClassDataFinder
 import org.jetbrains.kotlin.idea.decompiler.common.AnnotationLoaderForStubBuilderImpl
+import org.jetbrains.kotlin.idea.decompiler.common.FileWithMetadata
 import org.jetbrains.kotlin.idea.decompiler.stubBuilder.*
 import org.jetbrains.kotlin.psi.stubs.KotlinStubVersions
+import org.jetbrains.kotlin.serialization.deserialization.ProtoBasedClassDataFinder
 import org.jetbrains.kotlin.serialization.deserialization.ProtoContainer
 import org.jetbrains.kotlin.serialization.deserialization.TypeTable
 
@@ -34,13 +35,13 @@ class KotlinBuiltInStubBuilder : ClsStubBuilder() {
     override fun buildFileStub(content: FileContent): PsiFileStub<*>? {
         val virtualFile = content.file
         assert(virtualFile.fileType == KotlinBuiltInFileType) { "Unexpected file type ${virtualFile.fileType}" }
-        val file = BuiltInDefinitionFile.read(virtualFile) ?: return null
+        val file = BuiltInDefinitionFile.read(content.content, virtualFile) ?: return null
 
         when (file) {
-            is BuiltInDefinitionFile.Incompatible -> {
+            is FileWithMetadata.Incompatible -> {
                 return createIncompatibleAbiVersionFileStub()
             }
-            is BuiltInDefinitionFile.Compatible -> {
+            is FileWithMetadata.Compatible -> {
                 val packageProto = file.proto.`package`
                 val packageFqName = file.packageFqName
                 val nameResolver = file.nameResolver
