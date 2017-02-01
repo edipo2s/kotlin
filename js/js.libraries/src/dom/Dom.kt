@@ -40,9 +40,9 @@ fun Element?.childElements(name: String): List<Element> = this?.childNodes?.filt
 
 /** Returns all the descendant elements given the local element name */
 @JsName("deprecated_document_elements")
-@Deprecated("Use elements function with safe call", ReplaceWith("this?.elements().orEmpty()"), DeprecationLevel.ERROR)
+@Deprecated("Use elements function with safe call", ReplaceWith("this?.elements(localName).orEmpty()"), DeprecationLevel.ERROR)
 fun Document?.elements(localName: String = "*"): List<Element> {
-    return this?.elements().orEmpty()
+    return this?.elements(localName).orEmpty()
 }
 
 /** Returns all the descendant elements given the namespace URI and local element name */
@@ -108,7 +108,10 @@ public fun NodeList.asElementList(): List<Element> = ElementListAsList(this)
 /**
  * Returns a list containing only [Element] nodes.
  */
-public fun List<Node>.filterElements(): List<Element> = @Suppress("UNCHECKED_CAST") (filter { it.isElement } as List<Element>)
+public fun List<Node>.filterElements(): List<Element> {
+    @Suppress("UNCHECKED_CAST")
+    return filter { it.isElement } as List<Element>
+}
 
 /**
  * Returns a list containing only [Element] nodes.
