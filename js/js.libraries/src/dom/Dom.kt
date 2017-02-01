@@ -70,30 +70,30 @@ public fun Element.childElements(name: String): List<Element> {
     return this.childNodes.asList().filter { it.isElement && it.nodeName == name } as List<Element>
 }
 
-/** Returns all the descendant elements given the local element name */
+/** Returns all the descendant elements given the local element name. */
 public fun Element.elements(localName: String = "*"): List<Element> {
     return this.getElementsByTagName(localName).asElementList()
 }
 
-/** Returns all the descendant elements given the local element name */
+/** Returns all the descendant elements given the local element name. */
 public fun Document.elements(localName: String = "*"): List<Element> {
     return this.getElementsByTagName(localName).asElementList()
 }
 
-/** Returns all the descendant elements given the namespace URI and local element name */
+/** Returns all the descendant elements given the namespace URI and local element name. */
 public fun Element.elements(namespaceUri: String, localName: String): List<Element> {
     return this.getElementsByTagNameNS(namespaceUri, localName).asElementList()
 }
 
-/** Returns all the descendant elements given the namespace URI and local element name */
-fun Document.elements(namespaceUri: String, localName: String): List<Element> {
+/** Returns all the descendant elements given the namespace URI and local element name. */
+public fun Document.elements(namespaceUri: String, localName: String): List<Element> {
     return this.getElementsByTagNameNS(namespaceUri, localName).asElementList()
 }
 
 /**
  * Returns a view of this [NodeList] as a list of nodes.
  */
-fun NodeList.asList(): List<Node> = NodeListAsList(this)
+public fun NodeList.asList(): List<Node> = NodeListAsList(this)
 
 /**
  * Returns a view of this [NodeList] as a list of elements assuming that it contains only elements.
@@ -103,17 +103,17 @@ fun NodeList.asList(): List<Node> = NodeListAsList(this)
  *
  * If you want to get a snapshot filtered to contain elements only it's better to use [filterElements] function.
  */
-fun NodeList.asElementList(): List<Element> = ElementListAsList(this)
+public fun NodeList.asElementList(): List<Element> = ElementListAsList(this)
 
 /**
  * Returns a list containing only [Element] nodes.
  */
-fun List<Node>.filterElements(): List<Element> = @Suppress("UNCHECKED_CAST") (filter { it.isElement } as List<Element>)
+public fun List<Node>.filterElements(): List<Element> = @Suppress("UNCHECKED_CAST") (filter { it.isElement } as List<Element>)
 
 /**
  * Returns a list containing only [Element] nodes.
  */
-fun NodeList.filterElements(): List<Element> = asList().filterElements()
+public fun NodeList.filterElements(): List<Element> = asList().filterElements()
 
 
 private class NodeListAsList(private val delegate: NodeList) : AbstractList<Node>() {
@@ -141,7 +141,7 @@ private class ElementListAsList(private val nodeList: NodeList) : AbstractList<E
 }
 
 /** Returns an [Iterator] over the next siblings of this node. */
-fun Node.nextSiblings(): Iterable<Node> = NextSiblings(this)
+public fun Node.nextSiblings(): Iterable<Node> = NextSiblings(this)
 
 private class NextSiblings(private var node: Node) : Iterable<Node> {
     override fun iterator(): Iterator<Node> = object : AbstractIterator<Node>() {
@@ -158,7 +158,7 @@ private class NextSiblings(private var node: Node) : Iterable<Node> {
 }
 
 /** Returns an [Iterator] over the next siblings of this node. */
-fun Node.previousSiblings(): Iterable<Node> = PreviousSiblings(this)
+public fun Node.previousSiblings(): Iterable<Node> = PreviousSiblings(this)
 
 private class PreviousSiblings(private var node: Node) : Iterable<Node> {
     override fun iterator(): Iterator<Node> = object : AbstractIterator<Node>() {
