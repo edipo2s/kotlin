@@ -233,7 +233,7 @@ public final class Translation {
     }
 
     @NotNull
-    public static JsProgram generateAst(
+    public static AstGenerationResult generateAst(
             @NotNull BindingTrace bindingTrace,
             @NotNull Collection<KtFile> files,
             @NotNull MainCallParameters mainCallParameters,
@@ -252,7 +252,7 @@ public final class Translation {
     }
 
     @NotNull
-    private static JsProgram doGenerateAst(
+    private static AstGenerationResult doGenerateAst(
             @NotNull BindingTrace bindingTrace,
             @NotNull Collection<KtFile> files,
             @NotNull MainCallParameters mainCallParameters,
@@ -312,7 +312,7 @@ public final class Translation {
         block.getStatements().addAll(wrapIfNecessary(config.getModuleId(), rootFunction, importedModuleList, program,
                                                      config.getModuleKind()));
 
-        return program;
+        return new AstGenerationResult(program, rootPackageName, fragments);
     }
 
     private static boolean isBuiltinModule(@NotNull List<JsProgramFragment> fragments) {

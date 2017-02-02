@@ -18,7 +18,6 @@ package org.jetbrains.kotlin.js.translate.general
 
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.js.backend.ast.*
-import org.jetbrains.kotlin.js.inline.clean.resolveTemporaryNames
 import org.jetbrains.kotlin.js.translate.utils.JsAstUtils
 
 class Merger(private val rootFunction: JsFunction, val module: ModuleDescriptor) {

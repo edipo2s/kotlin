@@ -16,22 +16,21 @@
 
 package org.jetbrains.kotlin.js.inline
 
-import org.jetbrains.kotlin.js.backend.ast.metadata.inlineStrategy
 import com.google.gwt.dev.js.ThrowExceptionOnErrorReporter
 import com.intellij.util.containers.SLRUCache
-import org.jetbrains.kotlin.builtins.isExtensionFunctionType
 import org.jetbrains.kotlin.builtins.isFunctionTypeOrSubtype
 import org.jetbrains.kotlin.descriptors.CallableDescriptor
 import org.jetbrains.kotlin.js.backend.ast.*
+import org.jetbrains.kotlin.js.backend.ast.metadata.inlineStrategy
 import org.jetbrains.kotlin.js.config.LibrarySourcesConfig
 import org.jetbrains.kotlin.js.inline.util.IdentitySet
 import org.jetbrains.kotlin.js.inline.util.isCallInvocation
+import org.jetbrains.kotlin.js.naming.NameSuggestion
 import org.jetbrains.kotlin.js.parser.parseFunction
 import org.jetbrains.kotlin.js.translate.context.Namer
-import org.jetbrains.kotlin.js.translate.context.TranslationContext
 import org.jetbrains.kotlin.js.translate.reference.CallExpressionTranslator
-import org.jetbrains.kotlin.js.translate.utils.JsAstUtils
 import org.jetbrains.kotlin.js.translate.utils.JsDescriptorUtils.getExternalModuleName
+import org.jetbrains.kotlin.js.translate.utils.fqNameForDeclaration
 import org.jetbrains.kotlin.resolve.descriptorUtil.isExtension
 import org.jetbrains.kotlin.resolve.inline.InlineStrategy
 import org.jetbrains.kotlin.utils.JsLibraryUtils
@@ -49,7 +48,7 @@ private val JS_IDENTIFIER="[$JS_IDENTIFIER_START][$JS_IDENTIFIER_PART]*"
 private val DEFINE_MODULE_PATTERN = ("($JS_IDENTIFIER)\\.defineModule\\(\\s*(['\"])([^'\"]+)\\2\\s*,\\s*(\\w+)\\s*\\)").toRegex().toPattern()
 private val DEFINE_MODULE_FIND_PATTERN = ".defineModule("
 
-class FunctionReader(private val context: TranslationContext) {
+class FunctionReader(private val config: LibrarySourcesConfig, private val currentModuleName: JsName, fragments: List<JsProgramFragment>) {
     /**
      * Maps module name to .js file content, that contains this module definition.
      * One file can contain more than one module definition.
@@ -68,11 +67,17 @@ class FunctionReader(private val context: TranslationContext) {
      */
     private val moduleKotlinVariable = hashMapOf<String, String>()
 
+    private val nameSuggestion = NameSuggestion()
+
+    private val moduleNameMap: Map<JsFqName, JsExpression>
+
     init {
-        val config = context.config as LibrarySourcesConfig
+        val config = config
         val libs = config.libraries.map { File(it) }
 
-        JsLibraryUtils.traverseJsLibraries(libs) { fileContent, path ->
+        moduleNameMap = buildModuleNameMap(fragments)
+
+        JsLibraryUtils.traverseJsLibraries(libs) { fileContent, _ ->
             var current = 0
 
             while (true) {
@@ -93,6 +98,20 @@ class FunctionReader(private val context: TranslationContext) {
                 moduleKotlinVariable[moduleName] = kotlinVariable
             }
         }
+    }
+
+    private fun buildModuleNameMap(fragments: List<JsProgramFragment>): Map<JsFqName, JsExpression> {
+        val result = mutableMapOf<JsFqName, JsExpression>()
+        val moduleNames = fragments.flatMap { it.importedModules }.map { it.internalName }.toSet()
+        for ((fqName, expression) in fragments.flatMap { it.imports.entries }) {
+            expression.accept(object : RecursiveJsVisitor() {
+                override fun visitElement(node: JsNode) {
+                    super.visitElement(node)
+                    (node as? HasName)?.name?.takeIf { it in moduleNames }?.let { result[fqName] = it.makeRef() }
+                }
+            })
+        }
+        return result
     }
 
     private fun rewindToIdentifierStart(text: String, index: Int): Int {
@@ -121,7 +140,7 @@ class FunctionReader(private val context: TranslationContext) {
 
     operator fun contains(descriptor: CallableDescriptor): Boolean {
         val moduleName = getExternalModuleName(descriptor)
-        val currentModuleName = context.config.moduleId
+        val currentModuleName = config.moduleId
         return currentModuleName != moduleName && moduleName != null && moduleName in moduleJsDefinition
     }
 
@@ -150,17 +169,13 @@ class FunctionReader(private val context: TranslationContext) {
 
         val function = parseFunction(source, offset, ThrowExceptionOnErrorReporter, JsRootScope(JsProgram()))
         val moduleName = getExternalModuleName(descriptor)!!
-        val moduleReference = context.getModuleExpressionFor(descriptor) ?: getRootPackage()
+        val fqName = nameSuggestion.fqNameForDeclaration(descriptor)
+        val moduleReference = moduleNameMap[fqName] ?: currentModuleName.makeRef()
 
         val replacements = hashMapOf(moduleRootVariable[moduleName]!! to moduleReference,
                                      moduleKotlinVariable[moduleName]!! to Namer.kotlinObject())
         replaceExternalNames(function, replacements)
         return function
-    }
-
-    private fun getRootPackage(): JsExpression {
-        val rootName = context.program().rootScope.declareName(Namer.getRootPackageName())
-        return JsAstUtils.pureFqn(rootName, null)
     }
 }
 
