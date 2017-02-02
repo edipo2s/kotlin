@@ -28,6 +28,7 @@ import org.jetbrains.kotlin.descriptors.VariableDescriptor
 import org.jetbrains.kotlin.diagnostics.Diagnostic
 import org.jetbrains.kotlin.idea.caches.resolve.analyze
 import org.jetbrains.kotlin.idea.caches.resolve.resolveToDescriptor
+import org.jetbrains.kotlin.idea.caches.resolve.resolveToDescriptorIfAny
 import org.jetbrains.kotlin.idea.core.ShortenReferences
 import org.jetbrains.kotlin.idea.core.isVisible
 import org.jetbrains.kotlin.idea.core.moveCaret
@@ -39,6 +40,7 @@ import org.jetbrains.kotlin.psi.psiUtil.endOffset
 import org.jetbrains.kotlin.renderer.DescriptorRenderer
 import org.jetbrains.kotlin.renderer.render
 import org.jetbrains.kotlin.resolve.BindingContext
+import org.jetbrains.kotlin.resolve.lazy.BodyResolveMode
 import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.kotlin.types.TypeConstructorSubstitution
 import org.jetbrains.kotlin.types.typeUtil.isSubtypeOf
@@ -164,7 +166,8 @@ object SuperClassNotInitialized : KotlinIntentionActionsFactory() {
                     val nameString = parameter.name.asString()
                     val existingParameter = oldParameters.firstOrNull { it.name == nameString }
                     if (existingParameter != null) {
-                        val type = (existingParameter.resolveToDescriptor() as VariableDescriptor).type
+                        val type = (existingParameter.resolveToDescriptorIfAny(BodyResolveMode.FULL) as? VariableDescriptor)?.type
+                                   ?: return null
                         if (type.isSubtypeOf(parameter.type)) continue // use existing parameter
                     }
 

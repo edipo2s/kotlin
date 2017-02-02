@@ -21,11 +21,12 @@ import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiElementVisitor
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
-import org.jetbrains.kotlin.idea.caches.resolve.resolveToDescriptor
+import org.jetbrains.kotlin.idea.caches.resolve.resolveToDescriptorIfAny
 import org.jetbrains.kotlin.idea.project.languageVersionSettings
 import org.jetbrains.kotlin.psi.*
 import org.jetbrains.kotlin.resolve.deprecatedByOverriddenMessage
 import org.jetbrains.kotlin.resolve.getDeprecations
+import org.jetbrains.kotlin.resolve.lazy.BodyResolveMode
 
 class OverridingDeprecatedMemberInspection : AbstractKotlinInspection() {
     override fun buildVisitor(holder: ProblemsHolder, isOnTheFly: Boolean): PsiElementVisitor {
@@ -40,7 +41,7 @@ class OverridingDeprecatedMemberInspection : AbstractKotlinInspection() {
 
             private fun registerProblemIfNeeded(declaration: KtDeclaration, targetForProblem: PsiElement) {
                 if (declaration is KtDestructuringDeclarationEntry) return
-                val accessorDescriptor = declaration.resolveToDescriptor() as? CallableMemberDescriptor ?: return
+                val accessorDescriptor = declaration.resolveToDescriptorIfAny(BodyResolveMode.FULL) as? CallableMemberDescriptor ?: return
 
                 val message = accessorDescriptor.getDeprecations(declaration.languageVersionSettings)
                                       .firstOrNull()
