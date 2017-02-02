@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+@file:Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
 package kotlin.reflect
 
 /**
